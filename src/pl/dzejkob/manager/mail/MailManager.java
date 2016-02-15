@@ -12,6 +12,7 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomElement;
+import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlTable;
 import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
@@ -34,12 +35,12 @@ public class MailManager {
 		
 		final HtmlPage index = webClient.getPage(mailLink);
 
-		if(mailLink.equals(Mail.TENMINUTEMAIL_NET))
+		if(mailLink.equals(MailServer.TENMINUTEMAIL_NET))
 		{
 			DomElement mailContainer = index.getElementById("fe_text");
 			return mailContainer.getAttribute("value");
 		}
-		else if(mailLink.equals(Mail.TENMINUTEMAIL_COM))
+		else if(mailLink.equals(MailServer.TENMINUTEMAIL_COM))
 		{
 			DomElement mailContainer = index.getElementById("addyForm:addressSelect");
 			return mailContainer.getAttribute("value");	
@@ -52,20 +53,38 @@ public class MailManager {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void getMailList(String mailLink) throws FailingHttpStatusCodeException, MalformedURLException, IOException{
+	public List<Mail> getMailList(String mailLink) throws FailingHttpStatusCodeException, MalformedURLException, IOException{
 		final HtmlPage index = webClient.getPage(mailLink);
 		final HtmlTable table = index.getHtmlElementById("maillist");
 		List<HtmlTableRow> rows = new ArrayList(Arrays.asList(Arrays.copyOfRange(table.getRows().toArray(), 1, table.getRows().toArray().length)));
-
+		List<Mail> mailList = new ArrayList<Mail>();
+		
 		for (final HtmlTableRow row : rows) {
-		    System.out.println("Found row");
+			String sender = row.getCells().get(0).asText();
+			String subject = row.getCells().get(1).asText();
+			
 		    for (final HtmlTableCell cell : row.getCells()) {
-		        System.out.println("   Found cell: " + cell.asText());
+		    	
 		        if(cell.hasChildNodes())
-			        if(cell.getFirstElementChild().hasAttribute("href"))
-			        	System.out.println("   Found cell: " + cell.getFirstElementChild().getAttribute("href"));
+		        {
+		        	for (DomNode node : cell.getChildNodes())
+		        	{
+		        		if(node.hasAttributes())
+		        		{
+		        			if(node.getAttributes().getNamedItem("href") != null)
+		        			{
+		        				
+		        				HtmlPage mailPage = webClient.getPage(mailLink + node.getAttributes().getNamedItem("href").getNodeValue());
+		        				DomElement mailContainer = mailPage.getElementById("tabs-3");	        	
+		        				mailList.add(new Mail(sender, subject, mailContainer.asText()));	        				
+		        			}
+		        		}
+		        	}
+		        }
 		    }
 		}
+		
+		return mailList;
 	}
 	
 	public static MailManager getInstance() {

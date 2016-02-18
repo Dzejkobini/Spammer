@@ -21,40 +21,38 @@ import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
 @Singleton
 public class MailManager {
 
-	private static MailManager instance = null;
-	
 	private WebClient webClient = new WebClient(BrowserVersion.CHROME);
-	
+	private static MailManager instance = null;
+	public final String TENMINUTEMAIL_NET = "https://10minutemail.net/";
+
+	/*
+	 * Konstruktor
+	 * 
+	 */
 	private MailManager(){
 		this.webClient.getOptions().setThrowExceptionOnScriptError(false);
 		this.webClient.getOptions().setCssEnabled(false);
 		this.webClient.getOptions().setJavaScriptEnabled(false);
 	}
 	
-	public String getMailAddres(String mailLink) throws FailingHttpStatusCodeException, MalformedURLException, IOException{
-		
-		final HtmlPage index = webClient.getPage(mailLink);
-
-		if(mailLink.equals(MailServer.TENMINUTEMAIL_NET))
-		{
+	/*
+	 * 	Pobierz adres email.
+	 *	@Return {String} adres email.
+	 */
+	public String getMailAddres() throws FailingHttpStatusCodeException, MalformedURLException, IOException{
+		final HtmlPage index = webClient.getPage(TENMINUTEMAIL_NET);
 			DomElement mailContainer = index.getElementById("fe_text");
 			return mailContainer.getAttribute("value");
-		}
-		else if(mailLink.equals(MailServer.TENMINUTEMAIL_COM))
-		{
-			DomElement mailContainer = index.getElementById("addyForm:addressSelect");
-			return mailContainer.getAttribute("value");	
-		}
-		else
-		{
-			return "";
-		}
 		
 	}
 	
+	/*
+	 * Pobierz listê maili.
+	 * @Return {List<Mail>} Lista maili (nadawca, temat, treœæ maila (text))
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public List<Mail> getMailList(String mailLink) throws FailingHttpStatusCodeException, MalformedURLException, IOException{
-		final HtmlPage index = webClient.getPage(mailLink);
+	public List<Mail> getMailList() throws FailingHttpStatusCodeException, MalformedURLException, IOException{
+		final HtmlPage index = webClient.getPage(TENMINUTEMAIL_NET);
 		final HtmlTable table = index.getHtmlElementById("maillist");
 		List<HtmlTableRow> rows = new ArrayList(Arrays.asList(Arrays.copyOfRange(table.getRows().toArray(), 1, table.getRows().toArray().length)));
 		List<Mail> mailList = new ArrayList<Mail>();
@@ -73,8 +71,7 @@ public class MailManager {
 		        		{
 		        			if(node.getAttributes().getNamedItem("href") != null)
 		        			{
-		        				
-		        				HtmlPage mailPage = webClient.getPage(mailLink + node.getAttributes().getNamedItem("href").getNodeValue());
+		        				HtmlPage mailPage = webClient.getPage(TENMINUTEMAIL_NET + node.getAttributes().getNamedItem("href").getNodeValue());
 		        				DomElement mailContainer = mailPage.getElementById("tabs-3");	        	
 		        				mailList.add(new Mail(sender, subject, mailContainer.asText()));	        				
 		        			}
@@ -83,10 +80,13 @@ public class MailManager {
 		        }
 		    }
 		}
-		
 		return mailList;
 	}
 	
+	/*
+	 * Pobierz instancjê MailManager. Singleton.
+	 * @Return {MailManager}
+	 */
 	public static MailManager getInstance() {
 		if(instance == null) {
 			instance = new MailManager();

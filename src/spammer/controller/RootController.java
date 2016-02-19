@@ -1,4 +1,4 @@
-package pl.dzejkob.controller;
+package spammer.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

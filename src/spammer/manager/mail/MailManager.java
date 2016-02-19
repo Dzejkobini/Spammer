@@ -1,4 +1,4 @@
-package pl.dzejkob.manager.mail;
+package spammer.manager.mail;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -22,12 +22,13 @@ import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
 public class MailManager {
 
 	private WebClient webClient = new WebClient(BrowserVersion.CHROME);
+	
 	private static MailManager instance = null;
+	
 	public final String TENMINUTEMAIL_NET = "https://10minutemail.net/";
 
-	/*
+	/**
 	 * Konstruktor
-	 * 
 	 */
 	private MailManager(){
 		this.webClient.getOptions().setThrowExceptionOnScriptError(false);
@@ -35,9 +36,13 @@ public class MailManager {
 		this.webClient.getOptions().setJavaScriptEnabled(false);
 	}
 	
-	/*
-	 * 	Pobierz adres email.
-	 *	@Return {String} adres email.
+
+	/**
+	 * Pobranie adresu mail.
+	 * @return
+	 * @throws FailingHttpStatusCodeException
+	 * @throws MalformedURLException
+	 * @throws IOException
 	 */
 	public String getMailAddres() throws FailingHttpStatusCodeException, MalformedURLException, IOException{
 		final HtmlPage index = webClient.getPage(TENMINUTEMAIL_NET);
@@ -46,9 +51,12 @@ public class MailManager {
 		
 	}
 	
-	/*
-	 * Pobierz listê maili.
-	 * @Return {List<Mail>} Lista maili (nadawca, temat, treœæ maila (text))
+	/**
+	 * Pobranie listy maili.
+	 * @return mailList
+	 * @throws FailingHttpStatusCodeException
+	 * @throws MalformedURLException
+	 * @throws IOException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<Mail> getMailList() throws FailingHttpStatusCodeException, MalformedURLException, IOException{
@@ -83,9 +91,10 @@ public class MailManager {
 		return mailList;
 	}
 	
-	/*
-	 * Pobierz instancjê MailManager. Singleton.
-	 * @Return {MailManager}
+
+	/**
+	 * Pobranie instancji klasy.
+	 * @return instance
 	 */
 	public static MailManager getInstance() {
 		if(instance == null) {

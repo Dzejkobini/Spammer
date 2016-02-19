@@ -1,4 +1,4 @@
-package pl.dzejkob.manager.mail;
+package spammer.manager.mail;
 
 public class Mail {
 	

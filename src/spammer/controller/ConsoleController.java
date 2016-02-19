@@ -1,19 +1,24 @@
-package pl.dzejkob.controller;
+package spammer.controller;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 
-import pl.dzejkob.manager.mail.Mail;
-import pl.dzejkob.manager.mail.MailManager;
+import spammer.manager.mail.Mail;
+import spammer.manager.mail.MailManager;
+import spammer.manager.registration.NameGenerator;
+import spammer.manager.registration.RegistrationManager;
 
 
 @Controller
@@ -43,6 +48,23 @@ public class ConsoleController {
 		}
 		System.out.println(listContent.toString());
 		return new ModelAndView("console", "output", listContent.toString());
+	}
+	
+	@RequestMapping(params={"getActivationCode"}, method = RequestMethod.GET)
+	public ModelAndView retrieveActivationCode() throws FailingHttpStatusCodeException, MalformedURLException, IOException
+	{
+		RegistrationManager rm = new RegistrationManager();
+		List<Mail> mailList = MailManager.getInstance().getMailList();
+		rm.retrieveActivationCode(mailList);
+		return new ModelAndView("console", "output", "empty string");
+	}
+	
+	@RequestMapping(params={"getRandomName"}, method = RequestMethod.GET)
+	public ModelAndView retrieveRandomName() throws IOException
+	{
+		NameGenerator ng = new NameGenerator();
+	
+		return new ModelAndView("console", "output", ng.generateRandomName());
 	}
 	
 }

@@ -10,7 +10,7 @@
  http://www.springframework.org/schema/context 
  http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
-    <context:component-scan base-package="pl.dzejkob.controller" /> 
+    <context:component-scan base-package="spammer.controller" /> 
 
    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
       <property name="prefix" value="/WEB-INF/views/" />

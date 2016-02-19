@@ -44,6 +44,11 @@
         </executions>
       </plugin>
     </plugins>
+	<resources>
+		<resource>
+			<directory>${basedir}/WebContent/WEB-INF/resources/</directory>
+		</resource>
+	</resources> 
   </build>
   <dependencies>
 	<dependency>
